@@ -1,0 +1,135 @@
+# Claims ledger for synthesis-theory (schema evidence-kernel/claims@1, https://github.com/chethandvg/evidence-kernel).
+# Levels: P proved in Lean · V verified numerics · T tested · R referenced (DOI/PMID) · M model assumption.
+schema: evidence-kernel/claims@1
+repo: synthesis-theory
+prefix: synth
+claims:
+  - id: synth:BEATS
+    version: 1.0.0
+    level: P
+    statement: "sin a + sin b = 2·sin((a + b)/2)·cos((a − b)/2) for all real a, b (sin_add_sin), so two tones of frequencies f₁ and f₂ add up to 2·cos(π(f₁ − f₂)t)·sin(π(f₁ + f₂)t): a tone at the mean frequency whose size is the envelope |2·cos(π(f₁ − f₂)t)|."
+    proof: proofs/SynthesisTheory/Beats.lean#SynthesisTheory.beats
+  - id: synth:BEAT-RATE
+    version: 1.0.0
+    level: P
+    statement: "For f₁ ≠ f₂ the beat envelope |2·cos(π(f₁ − f₂)t)| repeats every 1/|f₁ − f₂| seconds and is zero exactly at t = (k + 1/2)/(f₁ − f₂) for integers k, once per period: two tones beat |f₁ − f₂| times a second."
+    proof: proofs/SynthesisTheory/Beats.lean#SynthesisTheory.beat_rate
+    depends_on: ["synth:BEATS@1"]
+  - id: synth:BINAURAL-BEATS
+    version: 1.0.0
+    level: R
+    statement: "When each ear hears a slightly different tone, the brain produces a beat at the difference frequency although the two waves never add physically (a binaural beat). It is generated in the auditory pathway, needs carriers up to about 1 kHz (best near 400 Hz), is heard only for differences up to about 30 Hz, and evokes weaker brain responses than the acoustic beat of the same two tones."
+    species: Homo sapiens
+    method: "EEG auditory steady-state responses and cortical evoked potentials to binaural and acoustic (monaural) beats; a systematic review of 14 EEG studies"
+    sources:
+      - cite: "Ingendoh, Posny and Heine 2023, PLOS ONE 18(5):e0286023 (systematic review)"
+        doi: "10.1371/journal.pone.0286023"
+      - cite: "Schwarz and Taylor 2005, Clinical Neurophysiology 116(3):658–668"
+        doi: "10.1016/j.clinph.2004.09.014"
+      - cite: "Pratt et al. 2010, Hearing Research 262(1–2):34–44"
+        doi: "10.1016/j.heares.2010.01.013"
+    notes: "synth:BEATS and synth:BEAT-RATE describe only the acoustic (monaural) beat, the physical sum of two waves in one ear or in the air; they neither explain nor predict binaural beats. Whether binaural beats entrain brain rhythms or change mood is contested (Ingendoh et al. 2023: 5 of 14 EEG studies supportive, 8 contradictory, 1 mixed) and is not claimed here."
+  - id: synth:FM-SIDEBANDS
+    version: 1.0.0
+    level: V
+    statement: "For a constant index I, sin(ω_c·t + I·sin ω_m·t) = Σₙ Jₙ(I)·sin((ω_c + n·ω_m)t), the Jacobi–Anger expansion (DLMF §10.12, cited, not proved here), so an FM tone has partials at f_c + n·f_m whose amplitudes are |Jₙ(I)|. Checked numerically: over one second (1 Hz bins) the DFT amplitudes of fm_tone at f_c + n·f_m match the amplitudes computed from mpmath's Jₙ(I) within 1e-12 for (f_c, f_m, I) = (1000 Hz, 1400 Hz, 2) and (1000 Hz, 1400 Hz, 10) at 44.1 kHz, and where reflected sidebands meet (f_c = f_m = 440 Hz, I = 1, where the carrier reads |J₀ − J₋₂|) or alias (1000 Hz, 700 Hz, 3 at 8 kHz)."
+    check: vectors/fm.json
+    tests: [tests/vectors.rs, bindings/python/tests/test_vectors.py, bindings/wasm/tests/vectors.test.mjs, src/fm.rs]
+    sources:
+      - cite: "NIST Digital Library of Mathematical Functions, §10.12 Generating Function and Associated Series"
+        url: "https://dlmf.nist.gov/10.12"
+    notes: "FM synthesis is Chowning 1973, 'The synthesis of complex audio spectra by means of frequency modulation', Journal of the Audio Engineering Society 21(7); no DOI for it could be verified, so it is cited here rather than as a source. The expected amplitudes come from the expansion alone (vectors/generate.py), never from a rendered tone."
+  - id: synth:BAR-MODES
+    version: 1.0.0
+    level: V
+    statement: "The first four positive roots of cos x·cosh x = 1, the frequency equation of a uniform free–free (Euler–Bernoulli) bar, are 4.7300407…, 7.8532046…, 10.9956078… and 14.1371654…, and its mode-frequency ratios (xₖ/x₁)² are 1 : 2.7565385… : 5.4039176… : 8.9329503… (digits cut off, not rounded), each certified to the digits shown by interval arithmetic (mpmath.iv): the equation has exactly eight roots in (0, 28] and each is bracketed to within 1e-45. lifesound.py's BAR_MODES (1, 2.756, 5.404, 8.933) agree within 5.4e-4: 5.404 and 8.933 are the ratios rounded to three decimals, while 2.756 is 2.75654 cut off (rounded, it would be 2.757)."
+    check: vectors/generate.py
+    tests: [vectors/bar_modes.json, src/modal.rs]
+    sources:
+      - cite: "Fletcher and Rossing 1998, The Physics of Musical Instruments (2nd ed.), Springer: vibrations of a free bar"
+        doi: "10.1007/978-0-387-21603-4"
+    notes: "The script certifies the roots before it writes any vector and stops if a step fails; on (0, 2] it uses the alternating Taylor series of cos x·cosh x, on [2, 28] interval subdivision with sign and monotonicity tests. It is run by the maintainer when the vectors are regenerated, not in CI; CI checks the Rust bisection against the certified values (synth:BAR-ROOTS-IN-CODE)."
+  - id: synth:TWO-POINT-AVERAGE-DELAY
+    version: 1.0.0
+    level: P
+    statement: "(1 + e^{−iω})/2 = e^{−iω/2}·cos(ω/2) for every real ω: the two-point average of the Karplus–Strong loop delays every frequency by exactly half a sample (while cos(ω/2) > 0, that is for |ω| < π)."
+    proof: proofs/SynthesisTheory/KarplusStrong.lean#SynthesisTheory.avgResponse_eq
+  - id: synth:KS-PITCH
+    version: 1.0.0
+    level: P
+    statement: "With a loop delay of N samples and the two-point average, the loop gain G(ω) = e^{−iωN}·(1 + e^{−iω})/2 equals e^{−iω(N + 1/2)}·cos(ω/2), and for |ω| < π it is a positive real number exactly when ω = 2πk/(N + 1/2) for an integer k: the loop resonates at f_k = k·sr/(N + 1/2), not at k·sr/N."
+    proof: proofs/SynthesisTheory/KarplusStrong.lean#SynthesisTheory.loopGain_pos_real_iff
+    depends_on: ["synth:TWO-POINT-AVERAGE-DELAY@1"]
+  - id: synth:KS-DECAY
+    version: 1.0.0
+    level: P
+    statement: "Per trip round the loop with gain decay, a component at ω is scaled in magnitude by |decay|·|cos(ω/2)|, and for decay ≠ 0 that factor strictly falls as ω rises from 0 to π: higher partials die faster."
+    proof: proofs/SynthesisTheory/KarplusStrong.lean#SynthesisTheory.loopGain_decay
+    depends_on: ["synth:TWO-POINT-AVERAGE-DELAY@1"]
+  - id: synth:KS-DETUNE
+    version: 1.0.0
+    level: T
+    statement: "karplus_strong rounds its loop to N = max(round(sr/freq), 2) samples and ignores the half sample of the average, so it sounds at karplus_strong_pitch = sr/(N + 1/2): at 44.1 kHz, 438.806 Hz for 440 Hz (N = 100, 4.70 cents flat), 13.30 cents flat at 880 Hz and 30.35 cents flat at 1760 Hz. The fundamental measured from the rendered string (the peak of its Hann-windowed spectrum) is within 0.02 cents of sr/(N + 1/2) from 110 to 1760 Hz at 44.1 kHz and at 440 and 1760 Hz at 48 kHz, and karplus_strong_detune_cents (pitch_math::cents) gives the detuning."
+    depends_on: ["synth:KS-PITCH@1"]
+    tests: [tests/properties.rs, vectors/strings.json, src/string.rs]
+    notes: "The largest measured residues, 0.0078 cents flat at 1760 Hz and 44.1 kHz (N = 25) and 0.0061 cents flat at 1760 Hz and 48 kHz (N = 27), are real rather than measurement errors: with damping (decay and the average's cos(ω/2)) the loop's poles, the roots of z^(N+1) = 0.498·(z + 1) for decay 0.996, sit slightly inside the unit circle and slightly flat of 2πk/(N + 1/2), the fundamental's by 0.0078 cents at N = 25, 0.0061 cents at N = 27, 0.0010 cents at N = 50 and 0.0002 cents at N = 100 (computed with mpmath), and each higher partial's by more. Loops of a few samples, outside the 110–1760 Hz range, are flatter still: the fundamental's pole sits 6.84 cents flat at N = 4 and 112.0 cents flat at N = 2 (numpy.roots), and tests/properties.rs measures 6.83 and 110.6 cents at 44.1 kHz."
+  - id: synth:KS-TUNED
+    version: 1.0.0
+    level: T
+    statement: "karplus_strong_tuned adds a first-order allpass (C + z⁻¹)/(1 + C·z⁻¹), C = (1 − Δ)/(1 + Δ), that makes the loop N + 1/2 + Δ = sr/freq samples long (Δ in [0.1, 1.1)). Its measured fundamental is within 1 cent of freq (at most 0.15 cents, at 1760 Hz and 44.1 kHz) from 110 to 1760 Hz at 44.1 kHz and at 440 and 1760 Hz at 48 kHz, where karplus_strong is up to 30 cents flat, and it matches the oracle (a plain-Python loop) within 1e-12. Higher strings, a few samples long, go flat again as the allpass's delay at the fundamental drifts from Δ and the loop's losses, mostly the average's cos(ω/2) rather than decay, pull its pole flat: 2.9 cents at 5 kHz and 16.8 cents at 10 kHz at 44.1 kHz."
+    depends_on: ["synth:KS-PITCH@1", "synth:KARPLUS-STRONG-MATCHES-REFERENCE@1"]
+    tests: [tests/properties.rs, vectors/strings.json, src/string.rs]
+    notes: "The allpass fractional delay for Karplus–Strong strings is from Jaffe and Smith 1983, 'Extensions of the Karplus–Strong plucked-string algorithm', Computer Music Journal 7(2), doi:10.2307/3680063. Keeping Δ at least 0.1 is this crate's choice, to keep C away from 1."
+  - id: synth:KARPLUS-STRONG-MATCHES-REFERENCE
+    version: 1.0.0
+    level: T
+    statement: "karplus_strong matches lifesound.py's string within 1e-12: a burst of N + 1 uniform samples in [−1, 1), low-passed by two passes of box_lowpass at pluck_brightness_hz and shifted to zero mean, then yᵢ = decay·0.5·(yᵢ₋ₙ + yᵢ₋ₙ₋₁), scaled to a peak just below 1, with the burst drawn from signal-core's SplitMix64 instead of numpy's generator."
+    depends_on: ["signal:RNG-REPRODUCIBLE@1", "signal:BOX-LOWPASS-MATCHES-REFERENCE@1", "signal:N-SAMPLES@1"]
+    tests: [vectors/strings.json, src/string.rs]
+    notes: "The string is the Karplus–Strong algorithm: Karplus and Strong 1983, 'Digital synthesis of plucked-string and drum timbres', Computer Music Journal 7(2), doi:10.2307/3680062."
+  - id: synth:MODAL-CHIME-MATCHES-REFERENCE
+    version: 1.0.0
+    level: T
+    statement: "modal_chime matches lifesound.py within 1e-12: one sine per mode of BAR_MODES at freq·ratio, mode k with amplitude (0.55·brightness)ᵏ and a 60 dB decay over dur/(1 + 1.6k) seconds, plus a 2 ms strike at 6·freq, scaled to a peak just below 1."
+    depends_on: ["signal:EXP-DECAY-60DB@1", "signal:N-SAMPLES@1"]
+    tests: [vectors/instruments.json, src/modal.rs]
+  - id: synth:FM-MATCHES-REFERENCE
+    version: 1.0.0
+    level: T
+    statement: "fm_bell matches lifesound.py's FM bell within 1e-12 (A(t)·sin(2π·fc·t + index·A(t)·sin(2π·fc·ratio·t)), A falling 60 dB over dur, then a 2 ms attack and 50 ms release), and fm_tone matches its formula sin(2π·fc·t + index·sin(2π·fm·t)) evaluated with numpy."
+    depends_on: ["signal:EXP-DECAY-60DB@1", "signal:ENVELOPES-MATCH-REFERENCE@1"]
+    tests: [vectors/instruments.json, vectors/fm.json]
+  - id: synth:SOFT-VOICE-MATCHES-REFERENCE
+    version: 1.0.0
+    level: T
+    statement: "soft_voice matches lifesound.py within 1e-12 on the golden vectors (signals of at most 600 samples): harmonics 1–4 (amplitudes 1, 0.25, 0.08, 0.03) of freq·2^(c/1200), with c = vibrato_cents·sin(2π·vibrato_hz·t)·min(t/0.4, 1), phase-integrated by signal-core's osc_sweep and shaped by its adsr. With vibrato the difference grows with the length of the signal, so longer voices can differ by more than 1e-12."
+    depends_on: ["signal:OSC-MATCHES-REFERENCE@1", "signal:ENVELOPES-MATCH-REFERENCE@1", "pitch:ET-FORMULA@1"]
+    tests: [vectors/instruments.json, src/voice.rs]
+    notes: "The crate takes c cents through pitch-math, freq·2^((69 + c/100 − 69)/12), a few ulps from numpy's freq·2^(c/1200), and the phase integration adds those differences up. Measured with the Python bindings against lifesound.py at 44.1 kHz (vibrato 5 Hz, 12 cents): 7.8e-13 after 1 s and 1.4e-12 after 2 s at 220 Hz, 1.5e-11 after 10 s at 440 Hz; without vibrato the two agree exactly."
+  - id: synth:HEARTBEAT-MATCHES-REFERENCE
+    version: 1.0.0
+    level: T
+    statement: "heartbeat matches lifesound.py exactly in placement and within 1e-12 in value: per beat of 60/bpm seconds, a 0.18 s thump sin(2π·f0·t·(1 − 0.35·t/0.18))·e^{−t/0.045} and a second at amplitude 0.6, min(0.3, 0.4·60/bpm) s later, each left out if it would reach the end."
+    depends_on: ["signal:N-SAMPLES@1"]
+    tests: [vectors/instruments.json, src/voice.rs]
+  - id: synth:BAR-ROOTS-IN-CODE
+    version: 1.0.0
+    level: T
+    statement: "free_bar_roots (bisection on cos x − 1/cosh x between kπ and (k + 1)π, down to adjacent doubles) returns the certified roots of synth:BAR-MODES rounded to the nearest double, for the first eight within 1e-15 relative (exactly, on the tested platforms), and free_bar_ratios their ratios (xₖ/x₁)² within 1e-15 relative."
+    depends_on: ["synth:BAR-MODES@1"]
+    tests: [vectors/bar_modes.json, src/modal.rs]
+  - id: synth:INPUT-VALIDATION
+    version: 1.0.0
+    level: T
+    statement: "Each function rejects, among its arguments, a zero or negative sample rate; a tone frequency (freq, fc, fm, f0), pluck brightness or bpm of 0 or below; a negative duration (and for modal_chime and fm_bell a duration of 0, for fm_spectrum one too short for a sample); NaN or an infinity anywhere; a decay outside [0, 1]; a string whose burst (one period plus one sample) would exceed MAX_SAMPLES; a tuned string above sr/2; more than one heartbeat per sample; and counts above their limits. The shape parameters brightness, ratio, index, vibrato_hz and vibrato_cents may be any finite number, as in lifesound.py, except that soft_voice also rejects, where lifesound.py gave NaN samples (or a 0 Hz pitch), a freq above f64::MAX/4 (its 4th harmonic would overflow), a vibrato_hz so large that 2π·vibrato_hz·t overflows by the last sample, and a vibrato_cents so large in size (about 1.2e6 at 220 Hz) that a harmonic of the pitch overflows or the pitch underflows to 0 Hz, each error naming that argument, though none of the three when the duration is too short for a sample (the signal is then empty, as in lifesound.py). Rust returns SynthError, Python raises ValueError (OverflowError for a negative or too-large integer argument such as a count, sample rate or seed, TypeError for a non-integer one) and JavaScript throws an Error (also for a count, sample rate or seed that is not a whole number up to 2^53 − 1)."
+    tests: [vectors/errors.json, tests/properties.rs, src/lib.rs, src/fm.rs, src/string.rs, src/voice.rs, bindings/python/tests/test_vectors.py, bindings/wasm/tests/vectors.test.mjs]
+    notes: "Finite input does not promise finite output: a frequency so large that 2π·f·t overflows (near f64::MAX) gives NaN samples, as it did in lifesound.py. In soft_voice that holds up to f64::MAX/4; above it, and for the vibrato values in the statement, soft_voice raises an error."
+  - id: synth:IMPLEMENTATIONS-AGREE
+    version: 1.0.0
+    level: T
+    statement: "The Rust crate, the Python bindings and the WebAssembly bindings all reproduce every golden vector. Every expected output comes from the oracle (lifesound.py's instruments run with numpy, with signal-core's SplitMix64 in place of numpy's generator and ln 1000 in exp_decay, plus exact fractions, mpmath Bessel functions and mpmath.iv intervals for the theory), never from the Rust output; the error cases in errors.json are the crate's own input rules."
+    tests:
+      - vectors/generate.py
+      - tests/vectors.rs
+      - bindings/python/tests/test_vectors.py
+      - bindings/wasm/tests/vectors.test.mjs

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["maturin>=1.16,<2"]
+build-backend = "maturin"
+
+[project]
+name = "synthesis-theory"
+version = "0.1.0"
+description = "Beats, FM sidebands, free-bar mode ratios and Karplus-Strong strings in Rust, Python and WebAssembly, proved in Lean 4 or verified numerically."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "Chethan Dandebala Venkatarama" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.22"]
+keywords = ["sound-synthesis", "fm-synthesis", "karplus-strong", "lean4", "rust"]
+classifiers = [
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Homepage = "https://chethandvg.github.io/frequencies-of-life/repos/synthesis-theory/"
+Repository = "https://github.com/chethandvg/synthesis-theory"
+
+[tool.maturin]
+module-name = "synthesis_theory"

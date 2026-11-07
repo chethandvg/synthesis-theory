@@ -1,0 +1,401 @@
+{
+ "schema": "golden-vectors@1",
+ "description": "Invalid input is rejected with an error in every binding.",
+ "tolerance": {
+  "rel": 1e-12,
+  "abs": 1e-12
+ },
+ "cases": [
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "modal_chime",
+   "args": [
+    440.0,
+    0.0,
+    1.0,
+    8000
+   ],
+   "error": true,
+   "note": "dur must be > 0 (lifesound.py fails on np.max of nothing)"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "modal_chime",
+   "args": [
+    -440.0,
+    0.1,
+    1.0,
+    8000
+   ],
+   "error": true,
+   "note": "freq must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "modal_chime",
+   "args": [
+    440.0,
+    0.1,
+    1.0,
+    0
+   ],
+   "error": true,
+   "note": "sr must be >= 1"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_bell",
+   "args": [
+    440.0,
+    -1.0,
+    1.4,
+    10.0,
+    8000
+   ],
+   "error": true,
+   "note": "a negative duration"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_bell",
+   "args": [
+    0.0,
+    1.0,
+    1.4,
+    10.0,
+    8000
+   ],
+   "error": true,
+   "note": "fc must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_tone",
+   "args": [
+    1000.0,
+    1400.0,
+    2.0,
+    -0.1,
+    8000
+   ],
+   "error": true,
+   "note": "a negative duration"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_tone",
+   "args": [
+    0.0,
+    1400.0,
+    2.0,
+    0.1,
+    8000
+   ],
+   "error": true,
+   "note": "fc must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_tone",
+   "args": [
+    1000.0,
+    0.0,
+    2.0,
+    0.1,
+    8000
+   ],
+   "error": true,
+   "note": "fm must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_spectrum",
+   "args": [
+    -1000,
+    1400,
+    2.0,
+    3,
+    1.0,
+    8000
+   ],
+   "error": true,
+   "note": "fc must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_spectrum",
+   "args": [
+    1000,
+    1400,
+    2.0,
+    3,
+    0.0,
+    8000
+   ],
+   "error": true,
+   "note": "no samples to measure"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "fm_spectrum",
+   "args": [
+    1000,
+    1400,
+    2.0,
+    134217729,
+    1.0,
+    8000
+   ],
+   "error": true,
+   "note": "n_max above MAX_SAMPLES / 2"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    440.0,
+    0.1,
+    8000,
+    1.5,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "decay above 1 would make the string grow"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    440.0,
+    0.1,
+    8000,
+    -0.1,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "decay must be in [0, 1]"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    0.0,
+    0.1,
+    8000,
+    0.9,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "freq must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    1e-09,
+    0.1,
+    44100,
+    0.9,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "a period longer than MAX_SAMPLES"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    440.0,
+    0.1,
+    8000,
+    0.9,
+    -1,
+    null
+   ],
+   "error": true,
+   "note": "a negative seed"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    440.0,
+    0.1,
+    8000,
+    0.9,
+    0,
+    0.0
+   ],
+   "error": true,
+   "note": "pluck_brightness_hz must be > 0 (or null)"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong",
+   "args": [
+    440.0,
+    -0.1,
+    8000,
+    0.9,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "a negative duration"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong_tuned",
+   "args": [
+    4001.0,
+    0.1,
+    8000,
+    0.9,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "freq must be at most sr / 2"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong_tuned",
+   "args": [
+    440.0,
+    0.1,
+    8000,
+    1.01,
+    0,
+    null
+   ],
+   "error": true,
+   "note": "decay must be in [0, 1]"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong_pitch",
+   "args": [
+    440.0,
+    0
+   ],
+   "error": true,
+   "note": "sr must be >= 1"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong_pitch",
+   "args": [
+    -1.0,
+    44100
+   ],
+   "error": true,
+   "note": "freq must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "karplus_strong_detune_cents",
+   "args": [
+    0.0,
+    44100
+   ],
+   "error": true,
+   "note": "freq must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "soft_voice",
+   "args": [
+    0.0,
+    0.1,
+    8000,
+    5.0,
+    12
+   ],
+   "error": true,
+   "note": "freq must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "soft_voice",
+   "args": [
+    220.0,
+    -0.1,
+    8000,
+    5.0,
+    12
+   ],
+   "error": true,
+   "note": "a negative duration"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "heartbeat",
+   "args": [
+    0.0,
+    1.0,
+    1000,
+    48.0
+   ],
+   "error": true,
+   "note": "bpm must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "heartbeat",
+   "args": [
+    60001.0,
+    1.0,
+    1000,
+    48.0
+   ],
+   "error": true,
+   "note": "more than one beat per sample"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "heartbeat",
+   "args": [
+    60.0,
+    1.0,
+    1000,
+    0.0
+   ],
+   "error": true,
+   "note": "f0 must be > 0"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "heartbeat",
+   "args": [
+    60.0,
+    1.0,
+    -1000,
+    48.0
+   ],
+   "error": true,
+   "note": "a negative sample rate"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "free_bar_roots",
+   "args": [
+    10001
+   ],
+   "error": true,
+   "note": "count must be at most 10000"
+  },
+  {
+   "claim": "synth:INPUT-VALIDATION",
+   "fn": "free_bar_ratios",
+   "args": [
+    -1
+   ],
+   "error": true,
+   "note": "a negative count"
+  }
+ ]
+}

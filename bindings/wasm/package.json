@@ -1,0 +1,22 @@
+{
+  "name": "@chethandvg/synthesis-theory",
+  "version": "0.1.0",
+  "description": "Beats, FM sidebands, free-bar mode ratios and Karplus-Strong strings in Rust, Python and WebAssembly, proved in Lean 4 or verified numerically.",
+  "license": "Apache-2.0",
+  "author": "Chethan Dandebala Venkatarama",
+  "homepage": "https://chethandvg.github.io/frequencies-of-life/repos/synthesis-theory/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chethandvg/synthesis-theory.git",
+    "directory": "bindings/wasm"
+  },
+  "keywords": ["sound-synthesis", "fm-synthesis", "karplus-strong", "lean4", "rust"],
+  "private": true,
+  "scripts": {
+    "build": "cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --target nodejs --out-dir pkg/node target/wasm32-unknown-unknown/release/synthesis_theory_wasm.wasm && wasm-bindgen --target web --out-dir pkg/web target/wasm32-unknown-unknown/release/synthesis_theory_wasm.wasm",
+    "test": "node --test \"tests/*.test.mjs\""
+  },
+  "devDependencies": {
+    "golden-vectors": "github:chethandvg/evidence-kernel#v0.1.0"
+  }
+}

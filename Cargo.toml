@@ -1,0 +1,30 @@
+[package]
+name = "synthesis-theory"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Beats, FM sidebands, free-bar mode ratios and Karplus-Strong strings in Rust, Python and WebAssembly, proved in Lean 4 or verified numerically."
+license = "Apache-2.0"
+authors = ["Chethan Dandebala Venkatarama"]
+repository = "https://github.com/chethandvg/synthesis-theory"
+homepage = "https://chethandvg.github.io/frequencies-of-life/repos/synthesis-theory/"
+readme = "README.md"
+keywords = ["sound-synthesis", "fm-synthesis", "karplus-strong", "lean4", "rust"]
+categories = ["mathematics", "science"]
+include = ["/src", "/README.md", "/LICENSE", "/NOTICE", "/CHANGELOG.md"]
+
+[dependencies]
+signal-core = { git = "https://github.com/chethandvg/signal-core", tag = "v0.1.0" }
+# Local form: signal-core = { path = "../signal-core" }
+pitch-math = { git = "https://github.com/chethandvg/pitch-math", tag = "v0.1.1" }
+# Local form: pitch-math = { path = "../pitch-math" }
+
+[dev-dependencies]
+golden-vectors = { git = "https://github.com/chethandvg/evidence-kernel", tag = "v0.1.0" }
+# Local form: golden-vectors = { path = "../evidence-kernel/crates/golden-vectors" }
+# float_roundtrip parses every vector number exactly, so zero-tolerance cases are reliable.
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"

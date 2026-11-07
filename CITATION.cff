@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it using these metadata."
+type: software
+title: "Synthesis theory"
+abstract: "Beats, FM sidebands, free-bar mode ratios and Karplus-Strong strings in Rust, Python and WebAssembly, proved in Lean 4 or verified numerically."
+authors:
+  - given-names: "Chethan"
+    family-names: "Dandebala Venkatarama"
+    alias: "chethandvg"
+    orcid: "https://orcid.org/0009-0006-6099-343X"
+repository-code: "https://github.com/chethandvg/synthesis-theory"
+url: "https://chethandvg.github.io/frequencies-of-life/repos/synthesis-theory/"
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-11-07"
+keywords:
+  - sound-synthesis
+  - fm-synthesis
+  - karplus-strong
+  - lean4
+  - rust

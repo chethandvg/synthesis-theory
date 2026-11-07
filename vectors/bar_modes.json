@@ -1,0 +1,97 @@
+{
+ "schema": "golden-vectors@1",
+ "description": "free_bar_roots and free_bar_ratios against roots certified with mpmath.iv.",
+ "tolerance": {
+  "rel": 1e-12,
+  "abs": 1e-12
+ },
+ "cases": [
+  {
+   "claim": "synth:BAR-ROOTS-IN-CODE",
+   "fn": "free_bar_roots",
+   "args": [
+    8
+   ],
+   "expected": [
+    4.730040744862704,
+    7.853204624095838,
+    10.995607838001671,
+    14.137165491257464,
+    17.27875965739948,
+    20.42035224562606,
+    23.561944902040455,
+    26.703537555508188
+   ],
+   "tolerance": {
+    "rel": 1e-15,
+    "abs": 0
+   },
+   "note": "certified by interval arithmetic in generate.py"
+  },
+  {
+   "claim": "synth:BAR-ROOTS-IN-CODE",
+   "fn": "free_bar_roots",
+   "args": [
+    1
+   ],
+   "expected": [
+    4.730040744862704
+   ],
+   "tolerance": {
+    "rel": 1e-15,
+    "abs": 0
+   }
+  },
+  {
+   "claim": "synth:BAR-ROOTS-IN-CODE",
+   "fn": "free_bar_roots",
+   "args": [
+    0
+   ],
+   "expected": [],
+   "tolerance": {
+    "rel": 1e-15,
+    "abs": 0
+   }
+  },
+  {
+   "claim": "synth:BAR-ROOTS-IN-CODE",
+   "fn": "free_bar_ratios",
+   "args": [
+    4
+   ],
+   "expected": [
+    1.0,
+    2.756538507099961,
+    5.403917632383322,
+    8.93295035238193
+   ],
+   "tolerance": {
+    "rel": 1e-15,
+    "abs": 0
+   },
+   "note": "1 : 2.7565 : 5.4039 : 8.9330"
+  },
+  {
+   "claim": "synth:BAR-ROOTS-IN-CODE",
+   "fn": "free_bar_ratios",
+   "args": [
+    8
+   ],
+   "expected": [
+    1.0,
+    2.756538507099961,
+    5.403917632383322,
+    8.93295035238193,
+    13.344286693666893,
+    18.637887886581186,
+    24.813756068843077,
+    31.871891128096493
+   ],
+   "tolerance": {
+    "rel": 1e-15,
+    "abs": 0
+   }
+  }
+ ]
+}
